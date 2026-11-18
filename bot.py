@@ -104,7 +104,7 @@ def fetch_source(src: dict, global_keywords: list[str]) -> tuple[str, list[Item]
         score = float(src.get("weight", 1))
         points = re.search(r"Points:\s*(\d+)", summary)
         if points:
-            score += min(int(points.group(1)) / 250, 2.0)
+            score += min(int(points.group(1)) / 400, 1.0)
         items.append(Item(name, src.get("category", "Ostalo"), title, link, entry_time(entry), score, summary))
     return name, items, None
 
@@ -138,20 +138,6 @@ def pick_new(items: list[Item], state: dict[str, float], max_age_days: int) -> l
     return fresh
 
 
-def pick_top(items: list[Item], n: int) -> list[Item]:
-    """Best n items, at most one per source so the list stays varied."""
-    ranked = sorted(items, key=lambda i: (i.score, i.published), reverse=True)
-    top, used = [], set()
-    for it in ranked:
-        if it.source in used:
-            continue
-        top.append(it)
-        used.add(it.source)
-        if len(top) == n:
-            break
-    return top
-
-
 def build_top_message(picks: list[tuple[Item, str]]) -> str:
     today = datetime.now(timezone.utc).strftime("%d.%m.%Y.")
     lines = [f"<b>📰 Top {len(picks)} iz DS / ML / AI — {today}</b>"]
@@ -164,8 +150,10 @@ def build_top_message(picks: list[tuple[Item, str]]) -> str:
     return "\n".join(lines)
 
 
-def choose_top(items: list[Item], n: int) -> list[tuple[Item, str]]:
-    """AI picks when an API key is set; otherwise (or if the AI call fails) the rules pick."""
+def choose_top(
+    items: list[Item], n: int, all_items: list[Item], sources: list[dict]
+) -> list[tuple[Item, str]]:
+    """AI picks when an API key is set; otherwise (or if the AI call fails) rank.py picks."""
     if os.environ.get("ANTHROPIC_API_KEY"):
         try:
             from ai_pick import ai_pick
@@ -174,7 +162,11 @@ def choose_top(items: list[Item], n: int) -> list[tuple[Item, str]]:
             return ai_pick(ranked, n)
         except Exception as exc:
             print(f"[warn] AI pick failed, using rules instead: {exc}", file=sys.stderr)
-    return [(it, "") for it in pick_top(items, n)]
+    from rank import rank_top
+
+    weights = {s["name"]: s.get("weight", 1) for s in sources}
+    caps = {s["name"]: s.get("top_cap", 1) for s in sources}
+    return rank_top(items, all_items, n, weights, caps)
 
 
 def build_messages(items: list[Item], per_source_cap: int) -> list[str]:
@@ -247,7 +239,7 @@ def main() -> int:
     if new_items:
         top_n = settings.get("top_n", 0)
         if top_n:
-            messages = [build_top_message(choose_top(new_items, top_n))]
+            messages = [build_top_message(choose_top(new_items, top_n, items, config["sources"]))]
         else:
             messages = build_messages(new_items, settings.get("per_source_cap", 5))
         if args.dry_run:
