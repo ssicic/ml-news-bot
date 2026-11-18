@@ -12,7 +12,10 @@ import requests
 
 REPO = "ssicic/ml-news-bot"
 
-token = getpass.getpass("Paste the bot token from @BotFather (input is hidden): ").strip()
+# Copy the token from @BotFather first; it is read from the clipboard (macOS).
+token = subprocess.run(["pbpaste"], capture_output=True, text=True).stdout.strip()
+if ":" not in token:
+    token = getpass.getpass("Paste the bot token from @BotFather (input is hidden): ").strip()
 me = requests.get(f"https://api.telegram.org/bot{token}/getMe", timeout=20).json()
 if not me.get("ok"):
     raise SystemExit("That token doesn't work. Copy it again from @BotFather.")
