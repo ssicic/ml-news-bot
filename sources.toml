@@ -2,8 +2,10 @@
 #   filter = true  -> only items that match [settings].keywords (for broad feeds)
 #   keywords = [...] -> per-source keyword list (overrides the global one)
 #   exclude = "regex" -> skip items whose title matches
+#   weight = 1..3    -> how much this source counts when picking the top 5
 
 [settings]
+top_n = 5              # send only the 5 best links a day (0 = send everything)
 max_age_days = 3       # ignore posts older than this
 per_source_cap = 5     # max links per source in one digest
 keep_state_days = 60   # how long to remember already-sent links
@@ -17,87 +19,103 @@ keywords = [
 # --- Labovi i kompanije ---
 [[sources]]
 name = "OpenAI"
+weight = 3
 category = "Labovi"
 url = "https://openai.com/news/rss.xml"
 
 [[sources]]
 name = "Google DeepMind"
+weight = 3
 category = "Labovi"
 url = "https://deepmind.google/blog/rss.xml"
 
 [[sources]]
 name = "Google Research"
+weight = 2
 category = "Labovi"
 url = "https://research.google/blog/rss/"
 
 [[sources]]
 name = "Hugging Face"
+weight = 2
 category = "Labovi"
 url = "https://huggingface.co/blog/feed.xml"
 
 [[sources]]
 name = "AWS Machine Learning"
+weight = 0.5
 category = "Labovi"
 url = "https://aws.amazon.com/blogs/machine-learning/feed/"
 
 # --- AI engineering ---
 [[sources]]
 name = "Simon Willison"
+weight = 2
 category = "AI engineering"
 url = "https://simonwillison.net/atom/everything/"
 max_items = 15
 
 [[sources]]
 name = "Latent Space"
+weight = 2
 category = "AI engineering"
 url = "https://www.latent.space/feed"
 
 [[sources]]
 name = "Eugene Yan"
+weight = 3
 category = "AI engineering"
 url = "https://eugeneyan.com/rss/"
 
 [[sources]]
 name = "Chip Huyen"
+weight = 3
 category = "AI engineering"
 url = "https://huyenchip.com/feed.xml"
 
 # --- ML / istraživanje ---
 [[sources]]
 name = "Sebastian Raschka"
+weight = 3
 category = "ML istraživanje"
 url = "https://magazine.sebastianraschka.com/feed"
 
 [[sources]]
 name = "Lil'Log"
+weight = 3
 category = "ML istraživanje"
 url = "https://lilianweng.github.io/index.xml"
 
 [[sources]]
 name = "Import AI"
+weight = 2
 category = "ML istraživanje"
 url = "https://importai.substack.com/feed"
 
 [[sources]]
 name = "The Gradient"
+weight = 2
 category = "ML istraživanje"
 url = "https://thegradient.pub/rss/"
 
 # --- Data science ---
 [[sources]]
 name = "Towards Data Science"
+weight = 1
 category = "Data science"
 url = "https://towardsdatascience.com/feed"
 filter = true
 
 [[sources]]
 name = "KDnuggets"
+weight = 0.5
 category = "Data science"
 url = "https://www.kdnuggets.com/feed"
 
 # --- Zajednica ---
 [[sources]]
 name = "Hacker News (100+ bodova)"
+weight = 1.5
 category = "Zajednica"
 url = "https://hnrss.org/newest?points=100"
 filter = true
@@ -105,18 +123,21 @@ filter = true
 # --- Release-ovi alata ---
 [[sources]]
 name = "transformers"
+weight = 1
 category = "Novi release-ovi"
 url = "https://github.com/huggingface/transformers/releases.atom"
 max_items = 3
 
 [[sources]]
 name = "vLLM"
+weight = 1
 category = "Novi release-ovi"
 url = "https://github.com/vllm-project/vllm/releases.atom"
 max_items = 3
 
 [[sources]]
 name = "PyTorch"
+weight = 2
 category = "Novi release-ovi"
 url = "https://github.com/pytorch/pytorch/releases.atom"
 exclude = "^(viable|nightly|ciflow|trunk)"  # skip internal CI tags

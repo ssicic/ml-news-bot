@@ -39,6 +39,7 @@ class Item:
     title: str
     link: str
     published: float  # unix timestamp, 0 if unknown
+    score: float = 0.0
 
 
 def load_config() -> dict:
@@ -98,7 +99,12 @@ def fetch_source(src: dict, global_keywords: list[str]) -> tuple[str, list[Item]
         summary = entry.get("summary", "")
         if not matches(f"{title} {summary}", keywords):
             continue
-        items.append(Item(name, src.get("category", "Ostalo"), title, link, entry_time(entry)))
+        # Score = how much you trust the source, plus a bonus for HN points.
+        score = float(src.get("weight", 1))
+        points = re.search(r"Points:\s*(\d+)", summary)
+        if points:
+            score += min(int(points.group(1)) / 250, 2.0)
+        items.append(Item(name, src.get("category", "Ostalo"), title, link, entry_time(entry), score))
     return name, items, None
 
 
@@ -129,6 +135,29 @@ def pick_new(items: list[Item], state: dict[str, float], max_age_days: int) -> l
         fresh.append(it)
     fresh.sort(key=lambda i: i.published, reverse=True)
     return fresh
+
+
+def pick_top(items: list[Item], n: int) -> list[Item]:
+    """Best n items, at most one per source so the list stays varied."""
+    ranked = sorted(items, key=lambda i: (i.score, i.published), reverse=True)
+    top, used = [], set()
+    for it in ranked:
+        if it.source in used:
+            continue
+        top.append(it)
+        used.add(it.source)
+        if len(top) == n:
+            break
+    return top
+
+
+def build_top_message(items: list[Item]) -> str:
+    today = datetime.now(timezone.utc).strftime("%d.%m.%Y.")
+    lines = [f"<b>📰 Top {len(items)} iz DS / ML / AI — {today}</b>", ""]
+    for n, it in enumerate(items, 1):
+        lines.append(f'{n}. <a href="{html.escape(it.link, quote=True)}">{html.escape(it.title)}</a>')
+        lines.append(f"    <i>{html.escape(it.source)}</i>")
+    return "\n".join(lines)
 
 
 def build_messages(items: list[Item], per_source_cap: int) -> list[str]:
@@ -199,7 +228,11 @@ def main() -> int:
     print(f"fetched {len(items)} items, {len(new_items)} new, {len(errors)} source errors")
 
     if new_items:
-        messages = build_messages(new_items, settings.get("per_source_cap", 5))
+        top_n = settings.get("top_n", 0)
+        if top_n:
+            messages = [build_top_message(pick_top(new_items, top_n))]
+        else:
+            messages = build_messages(new_items, settings.get("per_source_cap", 5))
         if args.dry_run:
             for m in messages:
                 print("-" * 40)
