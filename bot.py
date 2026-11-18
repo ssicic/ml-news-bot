@@ -105,7 +105,7 @@ def fetch_source(src: dict, global_keywords: list[str]) -> tuple[str, list[Item]
         points = re.search(r"Points:\s*(\d+)", summary)
         if points:
             score += min(int(points.group(1)) / 400, 1.0)
-        items.append(Item(name, src.get("category", "Ostalo"), title, link, entry_time(entry), score, summary))
+        items.append(Item(name, src.get("category", "Other"), title, link, entry_time(entry), score, summary))
     return name, items, None
 
 
@@ -139,14 +139,18 @@ def pick_new(items: list[Item], state: dict[str, float], max_age_days: int) -> l
 
 
 def build_top_message(picks: list[tuple[Item, str]]) -> str:
-    today = datetime.now(timezone.utc).strftime("%d.%m.%Y.")
-    lines = [f"<b>📰 Top {len(picks)} iz DS / ML / AI — {today}</b>"]
-    for n, (it, why) in enumerate(picks, 1):
+    from summarize import summarize
+
+    today = datetime.now(timezone.utc).strftime("%b %d, %Y")
+    lines = [f"<b>📰 Top {len(picks)} in DS / ML / AI — {today}</b>"]
+    for n, (it, note) in enumerate(picks, 1):
         lines.append("")
-        lines.append(f'{n}. <a href="{html.escape(it.link, quote=True)}">{html.escape(it.title)}</a>')
-        lines.append(f"<i>{html.escape(it.source)}</i>")
-        if why:
-            lines.append(html.escape(why))
+        lines.append(f'{n}. <a href="{html.escape(it.link, quote=True)}"><b>{html.escape(it.title)}</b></a>')
+        summary = summarize(it.title, it.link, it.summary)
+        if summary:
+            lines.append(html.escape(summary))
+        source_line = it.source + (f" · {note}" if note else "")
+        lines.append(f"<i>{html.escape(source_line)}</i>")
     return "\n".join(lines)
 
 
@@ -170,8 +174,8 @@ def choose_top(
 
 
 def build_messages(items: list[Item], per_source_cap: int) -> list[str]:
-    today = datetime.now(timezone.utc).strftime("%d.%m.%Y.")
-    header = f"<b>📰 DS / ML / AI vijesti — {today}</b>\n"
+    today = datetime.now(timezone.utc).strftime("%b %d, %Y")
+    header = f"<b>📰 DS / ML / AI news — {today}</b>\n"
 
     by_cat: dict[str, dict[str, list[Item]]] = {}
     for it in items:
@@ -186,7 +190,7 @@ def build_messages(items: list[Item], per_source_cap: int) -> list[str]:
                 lines.append(f'• <a href="{html.escape(it.link, quote=True)}">{html.escape(it.title)}</a>')
             extra = len(src_items) - per_source_cap
             if extra > 0:
-                lines.append(f"  … i još {extra}")
+                lines.append(f"  … and {extra} more")
         blocks.append("\n".join(lines))
 
     # Split into Telegram-sized messages on block / line boundaries.

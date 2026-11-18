@@ -109,7 +109,7 @@ def rank_top(
         used_clusters.add(c)
         per_source[it.source] += 1
         others = sorted(sources_in[c] - {it.source})
-        note = f"Piše i: {', '.join(others)}" if others else ""
+        note = f"Also covered by: {', '.join(others)}" if others else ""
         top.append((it, note))
         if len(top) == n:
             break

@@ -17,35 +17,35 @@ keywords = [
   "eval", "evals", "benchmark", "vector database", "Hugging Face", "OpenAI", "Anthropic", "DeepMind",
 ]
 
-# --- Labovi i kompanije ---
+# --- Labs and companies ---
 [[sources]]
 name = "OpenAI"
 weight = 3
-category = "Labovi"
+category = "Labs"
 url = "https://openai.com/news/rss.xml"
 
 [[sources]]
 name = "Google DeepMind"
 weight = 3
-category = "Labovi"
+category = "Labs"
 url = "https://deepmind.google/blog/rss.xml"
 
 [[sources]]
 name = "Google Research"
 weight = 2
-category = "Labovi"
+category = "Labs"
 url = "https://research.google/blog/rss/"
 
 [[sources]]
 name = "Hugging Face"
 weight = 2
-category = "Labovi"
+category = "Labs"
 url = "https://huggingface.co/blog/feed.xml"
 
 [[sources]]
 name = "AWS Machine Learning"
 weight = 0.5
-category = "Labovi"
+category = "Labs"
 url = "https://aws.amazon.com/blogs/machine-learning/feed/"
 
 # --- AI engineering ---
@@ -74,29 +74,29 @@ weight = 3
 category = "AI engineering"
 url = "https://huyenchip.com/feed.xml"
 
-# --- ML / istraživanje ---
+# --- ML research ---
 [[sources]]
 name = "Sebastian Raschka"
 weight = 3
-category = "ML istraživanje"
+category = "ML research"
 url = "https://magazine.sebastianraschka.com/feed"
 
 [[sources]]
 name = "Lil'Log"
 weight = 3
-category = "ML istraživanje"
+category = "ML research"
 url = "https://lilianweng.github.io/index.xml"
 
 [[sources]]
 name = "Import AI"
 weight = 2
-category = "ML istraživanje"
+category = "ML research"
 url = "https://importai.substack.com/feed"
 
 [[sources]]
 name = "The Gradient"
 weight = 2
-category = "ML istraživanje"
+category = "ML research"
 url = "https://thegradient.pub/rss/"
 
 # --- Data science ---
@@ -113,34 +113,34 @@ weight = 0.5
 category = "Data science"
 url = "https://www.kdnuggets.com/feed"
 
-# --- Zajednica ---
+# --- Community ---
 [[sources]]
-name = "Hacker News (100+ bodova)"
+name = "Hacker News"
 weight = 1.5
-category = "Zajednica"
+category = "Community"
 url = "https://hnrss.org/newest?points=100"
 filter = true
 top_cap = 2   # HN aggregates many sites, so allow 2 of its posts in the daily top 5
 
-# --- Release-ovi alata ---
+# --- Tool releases ---
 [[sources]]
 name = "transformers"
 weight = 1
-category = "Novi release-ovi"
+category = "Releases"
 url = "https://github.com/huggingface/transformers/releases.atom"
 max_items = 3
 
 [[sources]]
 name = "vLLM"
 weight = 1
-category = "Novi release-ovi"
+category = "Releases"
 url = "https://github.com/vllm-project/vllm/releases.atom"
 max_items = 3
 
 [[sources]]
 name = "PyTorch"
 weight = 2
-category = "Novi release-ovi"
+category = "Releases"
 url = "https://github.com/pytorch/pytorch/releases.atom"
 exclude = "^(viable|nightly|ciflow|trunk)"  # skip internal CI tags
 max_items = 30

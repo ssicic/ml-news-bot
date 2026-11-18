@@ -20,7 +20,7 @@ From the list of new posts, choose the most important ones for that reader. Pref
 Skip marketing, partnership announcements, listicles, beginner tutorials and near-duplicates
 (if two posts cover the same news, keep the better one).
 
-For each pick, write one short sentence in Croatian that says why it matters. Plain words, no hype."""
+For each pick, write one short sentence that says why it matters. Plain words, no hype."""
 
 
 class Pick(BaseModel):
