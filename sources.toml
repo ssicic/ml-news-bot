@@ -1,0 +1,123 @@
+# Feeds the bot reads. Add / remove [[sources]] blocks freely.
+#   filter = true  -> only items that match [settings].keywords (for broad feeds)
+#   keywords = [...] -> per-source keyword list (overrides the global one)
+#   exclude = "regex" -> skip items whose title matches
+
+[settings]
+max_age_days = 3       # ignore posts older than this
+per_source_cap = 5     # max links per source in one digest
+keep_state_days = 60   # how long to remember already-sent links
+keywords = [
+  "LLM", "LLMs", "GPT", "Claude", "Gemini", "Llama", "transformer", "RAG", "agent", "agents",
+  "machine learning", "deep learning", "neural", "AI", "ML", "MLOps", "LLMOps", "data science",
+  "embedding", "embeddings", "fine-tuning", "fine-tune", "inference", "PyTorch", "diffusion",
+  "eval", "evals", "benchmark", "vector database", "Hugging Face", "OpenAI", "Anthropic", "DeepMind",
+]
+
+# --- Labovi i kompanije ---
+[[sources]]
+name = "OpenAI"
+category = "Labovi"
+url = "https://openai.com/news/rss.xml"
+
+[[sources]]
+name = "Google DeepMind"
+category = "Labovi"
+url = "https://deepmind.google/blog/rss.xml"
+
+[[sources]]
+name = "Google Research"
+category = "Labovi"
+url = "https://research.google/blog/rss/"
+
+[[sources]]
+name = "Hugging Face"
+category = "Labovi"
+url = "https://huggingface.co/blog/feed.xml"
+
+[[sources]]
+name = "AWS Machine Learning"
+category = "Labovi"
+url = "https://aws.amazon.com/blogs/machine-learning/feed/"
+
+# --- AI engineering ---
+[[sources]]
+name = "Simon Willison"
+category = "AI engineering"
+url = "https://simonwillison.net/atom/everything/"
+max_items = 15
+
+[[sources]]
+name = "Latent Space"
+category = "AI engineering"
+url = "https://www.latent.space/feed"
+
+[[sources]]
+name = "Eugene Yan"
+category = "AI engineering"
+url = "https://eugeneyan.com/rss/"
+
+[[sources]]
+name = "Chip Huyen"
+category = "AI engineering"
+url = "https://huyenchip.com/feed.xml"
+
+# --- ML / istraživanje ---
+[[sources]]
+name = "Sebastian Raschka"
+category = "ML istraživanje"
+url = "https://magazine.sebastianraschka.com/feed"
+
+[[sources]]
+name = "Lil'Log"
+category = "ML istraživanje"
+url = "https://lilianweng.github.io/index.xml"
+
+[[sources]]
+name = "Import AI"
+category = "ML istraživanje"
+url = "https://importai.substack.com/feed"
+
+[[sources]]
+name = "The Gradient"
+category = "ML istraživanje"
+url = "https://thegradient.pub/rss/"
+
+# --- Data science ---
+[[sources]]
+name = "Towards Data Science"
+category = "Data science"
+url = "https://towardsdatascience.com/feed"
+filter = true
+
+[[sources]]
+name = "KDnuggets"
+category = "Data science"
+url = "https://www.kdnuggets.com/feed"
+
+# --- Zajednica ---
+[[sources]]
+name = "Hacker News (100+ bodova)"
+category = "Zajednica"
+url = "https://hnrss.org/newest?points=100"
+filter = true
+
+# --- Release-ovi alata ---
+[[sources]]
+name = "transformers"
+category = "Novi release-ovi"
+url = "https://github.com/huggingface/transformers/releases.atom"
+max_items = 3
+
+[[sources]]
+name = "vLLM"
+category = "Novi release-ovi"
+url = "https://github.com/vllm-project/vllm/releases.atom"
+max_items = 3
+
+[[sources]]
+name = "PyTorch"
+category = "Novi release-ovi"
+url = "https://github.com/pytorch/pytorch/releases.atom"
+exclude = "^(viable|nightly|ciflow|trunk)"  # skip internal CI tags
+max_items = 30
