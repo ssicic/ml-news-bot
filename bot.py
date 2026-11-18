@@ -40,6 +40,7 @@ class Item:
     link: str
     published: float  # unix timestamp, 0 if unknown
     score: float = 0.0
+    summary: str = ""
 
 
 def load_config() -> dict:
@@ -104,7 +105,7 @@ def fetch_source(src: dict, global_keywords: list[str]) -> tuple[str, list[Item]
         points = re.search(r"Points:\s*(\d+)", summary)
         if points:
             score += min(int(points.group(1)) / 250, 2.0)
-        items.append(Item(name, src.get("category", "Ostalo"), title, link, entry_time(entry), score))
+        items.append(Item(name, src.get("category", "Ostalo"), title, link, entry_time(entry), score, summary))
     return name, items, None
 
 
@@ -151,13 +152,29 @@ def pick_top(items: list[Item], n: int) -> list[Item]:
     return top
 
 
-def build_top_message(items: list[Item]) -> str:
+def build_top_message(picks: list[tuple[Item, str]]) -> str:
     today = datetime.now(timezone.utc).strftime("%d.%m.%Y.")
-    lines = [f"<b>📰 Top {len(items)} iz DS / ML / AI — {today}</b>", ""]
-    for n, it in enumerate(items, 1):
+    lines = [f"<b>📰 Top {len(picks)} iz DS / ML / AI — {today}</b>"]
+    for n, (it, why) in enumerate(picks, 1):
+        lines.append("")
         lines.append(f'{n}. <a href="{html.escape(it.link, quote=True)}">{html.escape(it.title)}</a>')
-        lines.append(f"    <i>{html.escape(it.source)}</i>")
+        lines.append(f"<i>{html.escape(it.source)}</i>")
+        if why:
+            lines.append(html.escape(why))
     return "\n".join(lines)
+
+
+def choose_top(items: list[Item], n: int) -> list[tuple[Item, str]]:
+    """AI picks when an API key is set; otherwise (or if the AI call fails) the rules pick."""
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        try:
+            from ai_pick import ai_pick
+
+            ranked = sorted(items, key=lambda i: (i.score, i.published), reverse=True)
+            return ai_pick(ranked, n)
+        except Exception as exc:
+            print(f"[warn] AI pick failed, using rules instead: {exc}", file=sys.stderr)
+    return [(it, "") for it in pick_top(items, n)]
 
 
 def build_messages(items: list[Item], per_source_cap: int) -> list[str]:
@@ -230,7 +247,7 @@ def main() -> int:
     if new_items:
         top_n = settings.get("top_n", 0)
         if top_n:
-            messages = [build_top_message(pick_top(new_items, top_n))]
+            messages = [build_top_message(choose_top(new_items, top_n))]
         else:
             messages = build_messages(new_items, settings.get("per_source_cap", 5))
         if args.dry_run:

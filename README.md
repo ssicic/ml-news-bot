@@ -16,6 +16,10 @@ Runs on GitHub Actions once a day, so nothing has to stay on your laptop. Links 
    *Settings → Secrets and variables → Actions*: `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`.
 4. *Actions → ML news digest → Run workflow* to test it. After that it runs every day at 06:00 UTC.
 
+## AI picks (optional)
+
+Add an `ANTHROPIC_API_KEY` secret and Claude picks the 5 most important links each day, with one sentence on why each matters. Without the key (or if the call fails) the bot falls back to picking by source weight.
+
 ## Local run
 
 ```bash

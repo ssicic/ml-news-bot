@@ -1,2 +1,4 @@
 feedparser==6.0.11
 requests==2.32.3
+anthropic==2.10.0
+pydantic==2.14.3
